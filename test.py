@@ -20,10 +20,11 @@ train_feature_creater.show_all_pars()
 train_feature_creater.reset_pars( 'datetime', 'do_get_year', False )
 train_feature_creater.show_all_pars()
 train_feature_creater.create_all_features( df, datatype='train', get_dropoff_datetime=False )
-train_feature_creater.drop_feature(df, 'Id')
-train_feature_creater.drop_feature(df, 'id')
+train_feature_creater.delete_feature(df, 'Id')
+train_feature_creater.delete_feature(df, 'id')
 print '>> [INFO] Done, used %s sec.'% str(time.time() - start_time)
 
 print df.head()
 print list(df)
+print df['store_and_fwd_flag'].unique()
 
