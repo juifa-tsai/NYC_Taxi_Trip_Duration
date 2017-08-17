@@ -56,9 +56,10 @@ class features:
 
     def reset_pars( self, partype, parName, value ):
         if   partype == 'datetime':        self.reset_pars_dict(  self.pars_datetime,        parName, value, partype )
+        elif partype == 'distance':        self.reset_pars_dict(  self.pars_distance,        parName, value, partype )
         elif partype == 'cluster_kmeans':  self.reset_pars_dict(  self.pars_cluster_kmeans,  parName, value, partype )
         elif partype == 'cluster_density': self.reset_pars_dict(  self.pars_cluster_density, parName, value, partype )
-        else: print '>> [ERROR] unknown partype called %s, must be either datetime, cluster_kmeans or cluster_density'
+        else: print '>> [ERROR] unknown partype called %s, must be either datetime, distance, cluster_kmeans or cluster_density'
 
 
     def reset_pars_dict( self, pars_dict, parName, value, title='' ):
