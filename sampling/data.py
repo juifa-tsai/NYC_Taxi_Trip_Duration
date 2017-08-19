@@ -3,6 +3,7 @@ import os, sys, re, time
 import numpy as np
 import pandas as pd
 
+from selectors import *
 from variables import *
 
 class data:
@@ -10,9 +11,11 @@ class data:
     def __init__( self, csv_path, debug=False ):
         self.DEBUG  = debug
         self.df     = None
+        self.N0     = 0
         self.N      = 0
         self.loaded = self.load_csv( csv_path )
         self.varGenerator = variables( self.DEBUG )
+        self.cuts    = []
         self.X_names = []
         self.y_names = []
         self.X = None 
@@ -27,6 +30,7 @@ class data:
             print '>> [INFO] Loading %s...'% csv_path 
             self.df        = pd.read_csv(csv_path)
             self.csv_path  = csv_path
+            self.N0        = len(self.df)
             self.N         = len(self.df)
             self.variables = list(self.df)
             print '>> [INFO] Done, %d data loaded'% self.N  
@@ -41,8 +45,24 @@ class data:
             return True
 
 
-    def generate_all_variables( self, datatype='train', X_names=None, y_names=None ):
+    def generate_variables( self, datatype = 'train', 
+                                  X_names  = None, 
+                                  y_names  = None, 
+                                  get_datetime_pickup  = True, 
+                                  get_datetime_dropoff = False,
+                                  get_distance         = True,
+                                  get_cluster_kmeans   = False,
+                                  get_cluster_density  = False,
+                                  get_store_and_fwd_flag = True,
+                                  ):
         if not self.is_loaded() : return False
+
+        self.varGenerator.get_datetime_pickup    = get_datetime_pickup
+        self.varGenerator.get_datetime_dropoff   = get_datetime_dropoff
+        self.varGenerator.get_distance           = get_distance
+        self.varGenerator.get_cluster_kmeans     = get_cluster_kmeans
+        self.varGenerator.get_cluster_density    = get_cluster_density
+        self.varGenerator.get_store_and_fwd_flag = get_store_and_fwd_flag
 
         print '>> [INFO] Generating variables...'
         start_time = time.time()
@@ -52,6 +72,12 @@ class data:
 
         if X_names and y_names:
             self.get_Xy( X_names, y_names)
+
+
+    def selection( self, cut_csv_path ):
+        self.df = selectors( cut_csv_path, self.DEBUG ).apply_cuts( self.df )
+        self.N = len(self.df)
+        self.cuts.append( cut_csv_path )
 
 
     def delete_variable( self, variable_name ):
@@ -68,7 +94,7 @@ class data:
         csv_exist = False
         if os.path.isfile(save_path): 
             if not overwrite:
-                print '>> [ERROR] Can not overwrite %s, unless force_w=True'
+                print '>> [ERROR] Can not overwrite %s, unless overwrite=True'
                 return
             csv_exist = True
 

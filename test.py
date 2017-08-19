@@ -15,15 +15,15 @@ train = data( csvfile_path, debug=True )
 train.varGenerator.show_pars_all()
 train.varGenerator.reset_pars( 'datetime', 'year', False )
 train.varGenerator.show_pars('datetime')
-train.varGenerator.get_datetime_dropoff = False
-train.generate_all_variables('train')
+train.generate_variables('train')
 train.delete_variable('Id')
 train.delete_variable('id')
 train.save_csv('tmp/test.csv', overwrite=True)
-
 print train.df.head()
-print train.variables, len(train.variables)
 print list(train.df)
+
+train.selection('data/precuts.csv')
+print len(train.df)
 
 
 ### Use sampling.variables

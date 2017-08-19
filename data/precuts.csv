@@ -1,0 +1,2 @@
+cut_max,cut_min,isBetween,name
+7200.0,300.0,1.0,trip_duration
