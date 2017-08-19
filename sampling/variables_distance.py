@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 import numpy as np
 import pandas as pd
-from features_helper import *
+from variables_helper import *
 
-class feature_distance:
+class variables_distance:
 
     def __init__( self, lng1=None, lat1=None, 
                         lng2=None, lat2=None ):

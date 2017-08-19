@@ -2,27 +2,27 @@
 import numpy as np
 import pandas as pd
 
-from features_datetime import *
-from features_cluster  import *
-from features_distance import *
-from features_helper   import *
+from variables_datetime import *
+from variables_cluster  import *
+from variables_distance import *
+from variables_helper   import *
 
-class features:
+class variables:
 
     def __init__( self, debug=False ):
         self.DEBUG = debug
 
-        #self.add_features = { 'datetime'           : { 'pickup' : True, 'dropoff': True }, 
+        #self.add_variables = { 'datetime'           : { 'pickup' : True, 'dropoff': True }, 
         #                      'distance'           : True,
         #                      'cluster'            : { 'kmeans' : True, 'density': True },
         #                      'store_and_fwd_flag' : True }
 
-        self.do_datetime_pickup    =  True
-        self.do_datetime_dropoff   =  True
-        self.do_distance           = True
-        self.do_cluster_kmeans     = True
-        self.do_cluster_density    = True
-        self.do_store_and_fwd_flag = True
+        self.get_datetime_pickup    =  True
+        self.get_datetime_dropoff   =  True
+        self.get_distance           = True
+        self.get_cluster_kmeans     = True
+        self.get_cluster_density    = True
+        self.get_store_and_fwd_flag = True
 
         self.pars_datetime = { 'year'        : True, 
                                'month'       : True,
@@ -80,6 +80,7 @@ class features:
 
 
     def reset_pars_dict( self, pars_dict, parName, value, title='' ):
+        if not is_exist( pars_dict, parName): return
         if self.DEBUG:
             print '>> [DEBUG] %s %s: %r -> %r'%( title, parName, pars_dict[parName], value )
         pars_dict[parName] = value
@@ -87,26 +88,26 @@ class features:
 
     #### Feature column creation ----------------------------
     
-    def create_all_features( self, df, datatype='train' ):
+    def create_all_variables( self, df, datatype='train' ):
         if self.DEBUG:
-            print '>> [DEBUG] do_datetime_pickup    = %r'% self.do_datetime_pickup 
-            print '>> [DEBUG] do_datetime_dropoff   = %r'% self.do_datetime_dropoff 
-            print '>> [DEBUG] do_distance           = %r'% self.do_distance 
-            print '>> [DEBUG] do_cluster_kmeans     = %r'% self.do_cluster_kmeans
-            print '>> [DEBUG] do_cluster_density    = %r'% self.do_cluster_density
-            print '>> [DEBUG] do_store_and_fwd_flag = %r'% self.do_store_and_fwd_flag 
+            print '>> [DEBUG] get_datetime_pickup    = %r'% self.get_datetime_pickup 
+            print '>> [DEBUG] get_datetime_dropoff   = %r'% self.get_datetime_dropoff 
+            print '>> [DEBUG] get_distance           = %r'% self.get_distance 
+            print '>> [DEBUG] get_cluster_kmeans     = %r'% self.get_cluster_kmeans
+            print '>> [DEBUG] get_cluster_density    = %r'% self.get_cluster_density
+            print '>> [DEBUG] get_store_and_fwd_flag = %r'% self.get_store_and_fwd_flag 
 
-        if self.do_datetime_pickup: 
+        if self.get_datetime_pickup: 
             self.create_datetime( df, 'pickup_datetime', 'pickup_' )
 
-        if self.do_datetime_dropoff and datatype == 'train': 
+        if self.get_datetime_dropoff and datatype == 'train': 
             self.create_datetime( df, 'dropoff_datetime', 'dropoff_' )
 
-        if self.do_distance:
+        if self.get_distance:
             self.create_distance( df, 'pickup_longitude',  'pickup_latitude', 
                                       'dropoff_longitude', 'dropoff_latitude' )
 
-        if self.do_store_and_fwd_flag:
+        if self.get_store_and_fwd_flag:
             newcol = create_variabel_column( df, 'store_and_fwd_flag', make_ny2bool )
             df.__delitem__('store_and_fwd_flag')
             df = add_variabel( df, 'store_and_fwd_flag', newcol )
@@ -117,7 +118,7 @@ class features:
 
     def create_datetime( self, df, dtVarName, name='' ):
         if is_exist(df, dtVarName):
-            dt = feature_datetime(df, dtVarName)
+            dt = variables_datetime(df, dtVarName)
             if self.pars_datetime['year']:         df[name+'year']         = dt.get_year()
             if self.pars_datetime['month']:        df[name+'month']        = dt.get_month()
             if self.pars_datetime['day']:          df[name+'day']          = dt.get_day()
@@ -140,8 +141,8 @@ class features:
         if not is_exist( df, lat_name1 ): return False
         if not is_exist( df, lng_name2 ): return False
         if not is_exist( df, lat_name2 ): return False
-        distances = feature_distance( df[lng_name1].values, df[lat_name1].values,
-                                      df[lng_name2].values, df[lat_name2].values )
+        distances = variables_distance( df[lng_name1].values, df[lat_name1].values,
+                                        df[lng_name2].values, df[lat_name2].values )
         if self.pars_distance['haversine']: 
             df['distance_haversine'] = pd.DataFrame( distances.get_distance_haversine() )
         if self.pars_distance['manhattan']: 
@@ -152,11 +153,11 @@ class features:
         return df
 
 
-    def delete_feature( self, df, feature_name ):
-        if feature_name in list(df):
-            df.__delitem__(feature_name)
+    def delete_variable( self, df, variable_name ):
+        if variable_name in list(df):
+            df.__delitem__(variable_name)
             if self.DEBUG:
-                print '>> [DEBUG] %s is dropped from dataframe'% feature_name
+                print '>> [DEBUG] %s is dropped from dataframe'% variable_name
         else:
-            print '>> [ERROR] No %s in dataframe for delete'% feature_name
+            print '>> [ERROR] No %s in dataframe for delete'% variable_name
         return df

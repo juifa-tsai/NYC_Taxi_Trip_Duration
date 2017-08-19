@@ -2,7 +2,7 @@
 import numpy as np
 import pandas as pd
 
-class feature_datetime:
+class variables_datetime:
 
     def __init__( self, df, dtVarName ):
         self.datetime = pd.to_datetime( df[dtVarName] )
