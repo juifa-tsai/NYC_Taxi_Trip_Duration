@@ -14,7 +14,7 @@ class feature_distance:
         self.lat2 = lat2
         self.covert_radians()
 
-    def covert_radians(self):
+    def covert_radians( self ):
         self.lat1_r, self.lng1_r, self.lat2_r, self.lng2_r = map( np.radians, (self.lat1, self.lng1, self.lat2, self.lng2))
 
     def get_distance( self, lng1_r=None, lat1_r=None, 
@@ -34,3 +34,10 @@ class feature_distance:
         a = self.get_distance( self.lng1_r, self.lat1_r, self.lng2_r, self.lat1_r )
         b = self.get_distance( self.lng1_r, self.lat1_r, self.lng1_r, self.lat2_r )
         return a + b # km
+
+    def get_direction( self ):
+        self.covert_radians()
+        delta_lng_r = np.radians(self.lng2 - self.lng1)
+        y = np.sin(delta_lng_r) * np.cos(self.lat2_r)
+        x = np.cos(self.lat1_r) * np.sin(self.lat2_r) - np.sin(self.lat1_r) * np.cos(self.lat2_r) * np.cos(delta_lng_r)
+        return np.degrees(np.arctan2(y, x)) # theta
