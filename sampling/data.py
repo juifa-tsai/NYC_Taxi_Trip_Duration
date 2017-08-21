@@ -13,13 +13,15 @@ class data:
         self.df     = None
         self.N0     = 0
         self.N      = 0
-        self.loaded = self.load_csv( csv_path )
-        self.varGenerator = variables( self.DEBUG )
-        self.cuts    = []
         self.X_names = []
         self.y_names = []
         self.X = None 
         self.y = None 
+        self.loaded       = self.load_csv( csv_path=csv_path )
+        self.varGenerator = variables( debug=self.DEBUG )
+        self.selector     = selectors( debug=self.DEBUG )
+        self.selections   = pd.DataFrame( columns=self.selector.columns )
+        self.effs         = self.selector.effs.copy()
 
 
     def load_csv( self, csv_path ):
@@ -74,10 +76,15 @@ class data:
             self.get_Xy( X_names, y_names)
 
 
-    def selection( self, cut_csv_path ):
-        self.df = selectors( cut_csv_path, self.DEBUG ).apply_cuts( self.df )
-        self.N = len(self.df)
-        self.cuts.append( cut_csv_path )
+    def load_selection( self, cut_csv_path ):
+        self.selector.load_cuts_csv( cut_csv_path )
+        self.selections = self.selections.append( self.selector.cuts, ignore_index=True )
+
+
+    def apply_selection( self ):
+        self.df   = self.selector.apply_cuts( self.df )
+        self.effs = self.effs.append( self.selector.effs, ignore_index=True )
+        self.N    = len(self.df)
 
 
     def delete_variable( self, variable_name ):

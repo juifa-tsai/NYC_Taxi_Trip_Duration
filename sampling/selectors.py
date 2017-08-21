@@ -11,31 +11,32 @@ infmax =  float('Inf')
 class selectors:
 
     def __init__( self, csv_path=None, debug=False ):
+        self.DEBUG  = debug
         self.cuts   = None
         self.loaded = False
         self.columns = [ 'name',     
                          'cut_min',  
                          'cut_max',  
-                         'isBetween',]
+                         'isBetween']
+        self.effs = pd.DataFrame( columns=['name','n','eff'] )
         if not csv_path:
-            self.cuts = pd.DataFrame( { self.columns[0]: [],
-                                        self.columns[1]: [],
-                                        self.columns[2]: [],
-                                        self.columns[3]: []})
+            self.cuts = pd.DataFrame( columns=self.columns )
         else:
-            self.loaded = self.load_cuts_csv( csv_path )
+            self.load_cuts_csv( csv_path )
 
     def load_cuts_csv( self, csv_path ):
+        ## Format of cut csv:
+        ## name, cut_min, cut_max, isBetween
         if not os.path.isfile(csv_path):
             print ">> [ERROR] Can't find %s, or may be not a file..."% csv_path
             return False 
         else: 
             self.cuts      = pd.read_csv(csv_path)
             self.csv_path  = csv_path
-            return True
-
-        ## Format of cut csv:
-        ## name, cut_min, cut_max, isBetween
+            self.loaded    = True
+            if self.DEBUG:
+                print '>> [DEBUG] cuts list: '
+                self.showCuts()
 
 
     def is_loaded( self ):
@@ -57,19 +58,25 @@ class selectors:
     def apply_cuts( self, df ):
         if not self.is_loaded() : return df
 
-        N0 = len(df)
+        N0  = float(len(df))
+        N_  = N0
+        eff = N_/N0
+        self.effs = pd.DataFrame( columns=['name', 'eff'] )
         for i in range(len(self.cuts)): 
             df = self.cutbase_selector( df,
                                         self.cuts.get_value( i, 'name'     ), 
                                         self.cuts.get_value( i, 'cut_min'  ),
                                         self.cuts.get_value( i, 'cut_max'  ),
                                         self.cuts.get_value( i, 'isBetween'))
-        print '>> [INFO] Cuts applied, %d date left, eff: %.2f'%( len(df), float(len(df))/float(N0) )
+            eff = len(df)/float(N_)
+            N_  = len(df)
+            self.effs = self.effs.append( pd.DataFrame([[self.cuts.get_value(i,'name'), N_, eff]], columns=['name','n','eff']) )
+        print '>> [INFO] Cuts applied, %d date left, eff: %.2f'%( N_, N_/N0 )
         return df 
 
 
     def add_cut( self, name, cut_min, cut_max, isBetween ):
-        df = pd.DataFrame( [[name, cut_min, cut_max, isBetween]], columns=self.columns )
+        df = pd.DataFrame( [[str(name), float(cut_min), float(cut_max), bool(isBetween)]], columns=self.columns )
         self.cuts = self.cuts.append( df, ignore_index=True )
 
 
@@ -91,4 +98,7 @@ class selectors:
         self.cuts.to_csv(save_path, index=False)
         print '>> [INFO] Done'
 
+
+    def showCuts( self ):
+        print self.cuts
 

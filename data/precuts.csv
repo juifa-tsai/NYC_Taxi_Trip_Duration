@@ -1,2 +1,3 @@
-cut_max,cut_min,isBetween,name
-7200.0,300.0,1.0,trip_duration
+name,cut_min,cut_max,isBetween
+trip_duration,300.0,7200.0,True
+distance_haversine,0.59567376271,11.0193052179,True
