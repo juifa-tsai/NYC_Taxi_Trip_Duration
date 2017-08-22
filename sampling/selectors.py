@@ -18,7 +18,8 @@ class selectors:
                          'cut_min',  
                          'cut_max',  
                          'isBetween']
-        self.effs = pd.DataFrame( columns=['name','n','eff'] )
+        self.columns_eff = [ 'name', 'N', 'eff' ]  
+        self.effs = pd.DataFrame( columns=self.columns_eff )
         if not csv_path:
             self.cuts = pd.DataFrame( columns=self.columns )
         else:
@@ -70,7 +71,8 @@ class selectors:
                                         self.cuts.get_value( i, 'isBetween'))
             eff = len(df)/float(N_)
             N_  = len(df)
-            self.effs = self.effs.append( pd.DataFrame([[self.cuts.get_value(i,'name'), N_, eff]], columns=['name','n','eff']) )
+            self.effs = self.effs.append( pd.DataFrame([[self.cuts.get_value(i,'name'), N_, eff]], columns=self.columns_eff ) )
+            self.effs = self.effs[self.columns_eff]
         print '>> [INFO] Cuts applied, %d date left, eff: %.2f'%( N_, N_/N0 )
         return df 
 
@@ -78,6 +80,32 @@ class selectors:
     def add_cut( self, name, cut_min, cut_max, isBetween ):
         df = pd.DataFrame( [[str(name), float(cut_min), float(cut_max), bool(isBetween)]], columns=self.columns )
         self.cuts = self.cuts.append( df, ignore_index=True )
+
+
+    def change_cut( self, name_idx, label, value ):
+        idx = [name_idx]
+        if type(name_idx) is str:
+            idx = self.cuts[ self.cuts['name'] == name_idx ].index.tolist()
+
+        if len(idx) is not 1:
+            print '>> [ERROR] selectors::change_cut() : multiple indexes found by named %s'% name_idx
+            return
+
+        #if type(self.cuts[label][idx].values[0]) != type(value):
+        #    print self.cuts[label][idx].values[0]
+        #    print '>> [ERROR] selectors::change_cut() : different type from %s to %s'% (type(self.cuts[label][idx].values[0]).__name__, type(value).__name__)
+        #    return
+
+        self.cuts.set_value( idx, label, value)
+
+
+
+    def remove_cut( self, name_idx ):
+        idx = [name_idx]
+        if type(name_idx) is str:
+            idx = self.cuts[ self.cuts['name'] == name_idx].index.tolist()
+
+        self.cuts = self.cuts.drop( self.cuts.index[idx] )
 
 
     def save_csv( self, save_path, overwrite=False ):
