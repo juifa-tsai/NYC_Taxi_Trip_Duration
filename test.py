@@ -22,7 +22,7 @@ train.delete_variable('id')
 print train.df.head()
 print list(train.df)
 
-train.load_selection('data/precuts.csv')
+train.load_selection('data/precuts_train.csv')
 train.apply_selection()
 print train.selections
 print train.effs

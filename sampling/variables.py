@@ -17,9 +17,10 @@ class variables:
         #                      'cluster'            : { 'kmeans' : True, 'density': True },
         #                      'store_and_fwd_flag' : True }
 
-        self.get_datetime_pickup    =  True
-        self.get_datetime_dropoff   =  True
+        self.get_datetime_pickup    = True
+        self.get_datetime_dropoff   = True
         self.get_distance           = True
+        self.get_speed              = True
         self.get_cluster_kmeans     = True
         self.get_cluster_density    = True
         self.get_store_and_fwd_flag = True
@@ -42,6 +43,9 @@ class variables:
                                'manhattan'   : True,
                                'direction'   : True}
 
+        self.pars_speed    = { 'haversine'   : True, 
+                               'manhattan'   : True}
+
         self.pars_cluster_kmeans  = { 'zones': True} 
 
         self.pars_cluster_density = { 'D'    : True,
@@ -53,6 +57,7 @@ class variables:
     def show_pars_all( self ):
         self.show_pars('datetime'       )
         self.show_pars('distance'       )
+        self.show_pars('speed'          )
         self.show_pars('cluster_kmeans' )
         self.show_pars('cluster_density')
 
@@ -60,6 +65,7 @@ class variables:
     def show_pars( self, partype ):
         if   partype == 'datetime':        self.show_pars_dict( self.pars_datetime,        'datetime'       )
         elif partype == 'distance':        self.show_pars_dict( self.pars_distance,        'distance'       )
+        elif partype == 'speed':           self.show_pars_dict( self.pars_speed,           'speed'          )
         elif partype == 'cluster_kmeans':  self.show_pars_dict( self.pars_cluster_kmeans,  'cluster_kmeans' )
         elif partype == 'cluster_density': self.show_pars_dict( self.pars_cluster_density, 'cluster_density')
         else: print '>> [ERROR] unknown partype called %s, must be either datetime, distance, cluster_kmeans or cluster_density'
@@ -74,6 +80,7 @@ class variables:
     def reset_pars( self, partype, parName, value ):
         if   partype == 'datetime':        self.reset_pars_dict(  self.pars_datetime,        parName, value, partype )
         elif partype == 'distance':        self.reset_pars_dict(  self.pars_distance,        parName, value, partype )
+        elif partype == 'speed':           self.reset_pars_dict(  self.pars_speed,           parName, value, partype )
         elif partype == 'cluster_kmeans':  self.reset_pars_dict(  self.pars_cluster_kmeans,  parName, value, partype )
         elif partype == 'cluster_density': self.reset_pars_dict(  self.pars_cluster_density, parName, value, partype )
         else: print '>> [ERROR] unknown partype called %s, must be either datetime, distance, cluster_kmeans or cluster_density'
@@ -93,6 +100,7 @@ class variables:
             print '>> [DEBUG] get_datetime_pickup    = %r'% self.get_datetime_pickup 
             print '>> [DEBUG] get_datetime_dropoff   = %r'% self.get_datetime_dropoff 
             print '>> [DEBUG] get_distance           = %r'% self.get_distance 
+            print '>> [DEBUG] get_speed              = %r'% self.get_speed
             print '>> [DEBUG] get_cluster_kmeans     = %r'% self.get_cluster_kmeans
             print '>> [DEBUG] get_cluster_density    = %r'% self.get_cluster_density
             print '>> [DEBUG] get_store_and_fwd_flag = %r'% self.get_store_and_fwd_flag 
@@ -106,6 +114,9 @@ class variables:
         if self.get_distance:
             self.create_distance( df, 'pickup_longitude',  'pickup_latitude', 
                                       'dropoff_longitude', 'dropoff_latitude' )
+
+        if self.get_speed and datatype == 'train':
+            self.create_speed( df )
 
         if self.get_store_and_fwd_flag:
             newcol = create_variabel_column( df, 'store_and_fwd_flag', make_ny2bool )
@@ -151,6 +162,17 @@ class variables:
             df['trip_direction']     = pd.DataFrame( distances.get_direction()          )  
         del distances
         return df
+
+
+    def create_speed( self, df, t_name='trip_duration', name_haversine='distance_haversine', name_manhattan='distance_manhattan' ):
+        if not is_exist( df, t_name ): return False
+
+        if self.pars_speed['haversine'] and is_exist( df, name_haversine ):
+            df['speed_haversine'] = df[name_haversine]/df[t_name]*60*60
+        if self.pars_speed['manhattan'] and is_exist( df, name_manhattan ):
+            df['speed_manhattan'] = df[name_manhattan]/df[t_name]*60*60
+        return df
+
 
 
     def delete_variable( self, df, variable_name ):

@@ -53,6 +53,7 @@ class data:
                                   get_datetime_pickup  = True, 
                                   get_datetime_dropoff = False,
                                   get_distance         = True,
+                                  get_speed            = True,
                                   get_cluster_kmeans   = False,
                                   get_cluster_density  = False,
                                   get_store_and_fwd_flag = True,
@@ -62,6 +63,7 @@ class data:
         self.varGenerator.get_datetime_pickup    = get_datetime_pickup
         self.varGenerator.get_datetime_dropoff   = get_datetime_dropoff
         self.varGenerator.get_distance           = get_distance
+        self.varGenerator.get_speed              = get_speed
         self.varGenerator.get_cluster_kmeans     = get_cluster_kmeans
         self.varGenerator.get_cluster_density    = get_cluster_density
         self.varGenerator.get_store_and_fwd_flag = get_store_and_fwd_flag
