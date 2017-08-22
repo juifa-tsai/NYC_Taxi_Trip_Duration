@@ -31,6 +31,9 @@ class variables_datetime:
     def get_weekday(self):
         return self.datetime.dt.weekday.astype(int) + 1
     
+    def get_digit_date(self):
+        return self.get_month()*100 + self.get_day()
+    
     def get_time_delta(self):
         return (self.datetime - self.datetime.min()).dt.total_seconds().astype(int)
     

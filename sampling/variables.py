@@ -33,6 +33,7 @@ class variables:
                                'second'      : True,
                                'daytime'     : True,
                                'weekday'     : True,
+                               'digit_date'  : True,
                                'time_delta'  : True,
                                'weektime'    : True,
                                'weekofyear'  : True,
@@ -138,6 +139,7 @@ class variables:
             if self.pars_datetime['second']:       df[name+'second']       = dt.get_second()
             if self.pars_datetime['daytime']:      df[name+'daytime']      = dt.get_daytime()
             if self.pars_datetime['weekday']:      df[name+'weekday']      = dt.get_weekday()
+            if self.pars_datetime['digit_date']:   df[name+'digit_date']   = dt.get_digit_date()
             if self.pars_datetime['time_delta']:   df[name+'time_delta']   = dt.get_time_delta()
             if self.pars_datetime['weektime']:     df[name+'weektime']     = dt.get_weektime()
             if self.pars_datetime['weekofyear']:   df[name+'weekofyear']   = dt.get_weekofyear()
