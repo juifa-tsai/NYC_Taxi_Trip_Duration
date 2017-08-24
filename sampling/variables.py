@@ -47,7 +47,8 @@ class variables:
         self.pars_speed    = { 'haversine'   : True, 
                                'manhattan'   : True}
 
-        self.pars_cluster_kmeans  = { 'zones': True} 
+        self.pars_cluster_kmeans  = { 'mixing' : True,
+                                      'std'    : True} 
 
         self.pars_cluster_density = { 'D'    : True,
                                       'Dstd' : True}
@@ -150,10 +151,10 @@ class variables:
 
 
     def create_distance( self, df, lng_name1, lat_name1, lng_name2, lat_name2 ):
-        if not is_exist( df, lng_name1 ): return False 
-        if not is_exist( df, lat_name1 ): return False
-        if not is_exist( df, lng_name2 ): return False
-        if not is_exist( df, lat_name2 ): return False
+        if not is_exist( df, lng_name1 ): return df 
+        if not is_exist( df, lat_name1 ): return df
+        if not is_exist( df, lng_name2 ): return df
+        if not is_exist( df, lat_name2 ): return df
         distances = variables_distance( df[lng_name1].values, df[lat_name1].values,
                                         df[lng_name2].values, df[lat_name2].values )
         if self.pars_distance['haversine']: 
@@ -167,7 +168,7 @@ class variables:
 
 
     def create_speed( self, df, t_name='trip_duration', name_haversine='distance_haversine', name_manhattan='distance_manhattan' ):
-        if not is_exist( df, t_name ): return False
+        if not is_exist( df, t_name ): return df
 
         if self.pars_speed['haversine'] and is_exist( df, name_haversine ):
             df['speed_haversine'] = df[name_haversine]/df[t_name]*60*60
@@ -175,6 +176,28 @@ class variables:
             df['speed_manhattan'] = df[name_manhattan]/df[t_name]*60*60
         return df
 
+
+    #def create_cluster_kmeans( self, df, 
+    #                           pickup_lng='pickup_longitude',   pickup_lat='pickup_latitude', 
+    #                           dropoff_lng='dropoff_longitude', dropoff_lat='dropoff_latitude',
+    #                           mixing_path='', 
+    #                           std_pickup_path='', 
+    #                           std_dropoff_path='' ):
+    #    if not is_exist( df, pickup_lng ):  return df
+    #    if not is_exist( df, pickup_lat ):  return df
+    #    if not is_exist( df, dropoff_lng ): return df
+    #    if not is_exist( df, dropoff_lat ): return df
+
+    #    if self.pars_cluster_kmeans['mixing']:
+    #        if os.path.isfile(mixing_path):
+
+    #        else:
+    #            df_train  = pd.DataFrame( np.vstack(( df[[ pickup_lng,  pickup_lat]].values, 
+    #                                                  df[[dropoff_lng, dropoff_lat]].values)), 
+    #                                      columns=['longitude','latitude'])
+    #            kmeans = cluster_kmeans( df_train, ['longitude','latitude'], self.DEBUG )
+    #     
+    #    if self.pars_cluster_kmeans['std']:
 
 
     def delete_variable( self, df, variable_name ):
