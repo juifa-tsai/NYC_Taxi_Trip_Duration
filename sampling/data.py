@@ -100,22 +100,14 @@ class data:
         return 
 
     def save_csv( self, save_path, overwrite=False ):
-        csv_exist = False
-        if os.path.isfile(save_path): 
-            if not overwrite:
-                print '>> [ERROR] Can not overwrite %s, unless overwrite=True'
-                return
-            csv_exist = True
-
-        dir_ = re.sub(r'(.*)/.*', r'\1', save_path)
-        if not os.path.isfile(dir_) and not os.path.isdir(dir_):
-            os.mkdir(dir_)
-            print '>> [INFO] Created %s'% dir_
-
-        if csv_exist: print '>> [INFO] Overwriting to %s...'% save_path
-        else:         print '>> [INFO] Saving to %s...'% save_path
+        is_writable_ = is_writable( save_path, overwrite )
+        if not is_writable_[0]: 
+            return False
+        if is_writable_[1] : print '>> [INFO] Overwriting to %s...'% save_path
+        else:                print '>> [INFO] Saving to %s...'% save_path
         self.df.to_csv(save_path, index=False)
         print '>> [INFO] Done'
+        return True
 
 
 

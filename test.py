@@ -18,7 +18,7 @@ train.varGenerator.show_pars('datetime')
 train.generate_variables('train')
 train.delete_variable('Id')
 train.delete_variable('id')
-#train.save_csv('tmp/test.csv', overwrite=True)
+train.save_csv('tmp/test.csv', overwrite=True)
 print train.df.head()
 print list(train.df)
 
