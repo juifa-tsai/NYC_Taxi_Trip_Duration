@@ -47,11 +47,22 @@ class variables:
         self.pars_speed    = { 'haversine'   : True, 
                                'manhattan'   : True}
 
-        self.pars_cluster_kmeans  = { 'mixing' : True,
-                                      'std'    : True} 
+        self.pars_cluster_kmeans  = { 'mix' : True,
+                                      'std' : True} 
 
         self.pars_cluster_density = { 'D'    : True,
                                       'Dstd' : True}
+
+        self.args_cluster_kmeans = { 'load_path_mix'        : '', 
+                                     'load_path_std_pickup' : '', 
+                                     'load_path_std_dropoff': '',
+                                     'save_path_mix'        : './kmeans_mix.pkl',
+                                     'save_path_std_pickup' : './kmeans_pickup.pkl', 
+                                     'save_path_std_dropoff': './kmeans_dropoff.pkl',
+                                     'overwrite'            : False,
+                                     'use_sample'           : None,
+                                     'batch_size'           : 10000,
+                                     'n_zone'               : 100}
 
 
     #### For parameters setting ----------------------------
@@ -108,17 +119,39 @@ class variables:
             print '>> [DEBUG] get_store_and_fwd_flag = %r'% self.get_store_and_fwd_flag 
 
         if self.get_datetime_pickup: 
-            self.create_datetime( df, 'pickup_datetime', 'pickup_' )
+            self.create_datetime( df, dtVarName = 'pickup_datetime', 
+                                           name = 'pickup_')
 
         if self.get_datetime_dropoff and datatype == 'train': 
-            self.create_datetime( df, 'dropoff_datetime', 'dropoff_' )
+            self.create_datetime( df, dtVarName = 'dropoff_datetime', 
+                                           name = 'dropoff_')
 
         if self.get_distance:
-            self.create_distance( df, 'pickup_longitude',  'pickup_latitude', 
-                                      'dropoff_longitude', 'dropoff_latitude' )
+            self.create_distance( df, lng_name1 = 'pickup_longitude',  
+                                      lat_name1 = 'pickup_latitude', 
+                                      lng_name2 = 'dropoff_longitude', 
+                                      lat_name2 = 'dropoff_latitude')
 
         if self.get_speed and datatype == 'train':
-            self.create_speed( df )
+            self.create_speed( df, name_haversine = 'distance_haversine', 
+                                   name_manhattan = 'distance_manhattan',
+                                           t_name = 'trip_duration') 
+
+        if self.get_cluster_kmeans:
+            self.create_cluster_kmeans( df,  pickup_lng = 'pickup_longitude',  
+                                             pickup_lat = 'pickup_latitude',
+                                            dropoff_lng = 'dropoff_longitude', 
+                                            dropoff_lat = 'dropoff_latitude',
+                                        load_path_mix         = self.args_cluster_kmeans['load_path_mix'], 
+                                        load_path_std_pickup  = self.args_cluster_kmeans['load_path_std_pickup'], 
+                                        load_path_std_dropoff = self.args_cluster_kmeans['load_path_std_dropoff'],
+                                        save_path_mix         = self.args_cluster_kmeans['save_path_mix'],
+                                        save_path_std_pickup  = self.args_cluster_kmeans['save_path_std_pickup'], 
+                                        save_path_std_dropoff = self.args_cluster_kmeans['save_path_std_dropoff'],
+                                        overwrite             = self.args_cluster_kmeans['overwrite'],
+                                        use_sample            = self.args_cluster_kmeans['use_sample'],
+                                        batch_size            = self.args_cluster_kmeans['batch_size'],
+                                        n_zone                = self.args_cluster_kmeans['n_zone'])
 
         if self.get_store_and_fwd_flag:
             newcol = create_variabel_column( df, 'store_and_fwd_flag', make_ny2bool )
@@ -167,7 +200,7 @@ class variables:
         return df
 
 
-    def create_speed( self, df, t_name='trip_duration', name_haversine='distance_haversine', name_manhattan='distance_manhattan' ):
+    def create_speed( self, df, t_name, name_haversine, name_manhattan ):
         if not is_exist( df, t_name ): return df
 
         if self.pars_speed['haversine'] and is_exist( df, name_haversine ):
@@ -177,28 +210,65 @@ class variables:
         return df
 
 
-    #def create_cluster_kmeans( self, df, 
-    #                           pickup_lng='pickup_longitude',   pickup_lat='pickup_latitude', 
-    #                           dropoff_lng='dropoff_longitude', dropoff_lat='dropoff_latitude',
-    #                           mixing_path='', 
-    #                           std_pickup_path='', 
-    #                           std_dropoff_path='' ):
-    #    if not is_exist( df, pickup_lng ):  return df
-    #    if not is_exist( df, pickup_lat ):  return df
-    #    if not is_exist( df, dropoff_lng ): return df
-    #    if not is_exist( df, dropoff_lat ): return df
+    def create_cluster_kmeans( self, df, 
+                               pickup_lng,   
+                               pickup_lat, 
+                               dropoff_lng, 
+                               dropoff_lat,
+                               load_path_mix='', 
+                               load_path_std_pickup='', 
+                               load_path_std_dropoff='',
+                               save_path_mix='./kmeans_mix.pkl',
+                               save_path_std_pickup='./kmeans_pickup.pkl', 
+                               save_path_std_dropoff='./kmeans_dropoff.pkl',
+                               overwrite =False,
+                               use_sample=None,
+                               batch_size=10000,
+                               n_zone=100 ):
+        if not is_exist( df, pickup_lng ):  return df
+        if not is_exist( df, pickup_lat ):  return df
+        if not is_exist( df, dropoff_lng ): return df
+        if not is_exist( df, dropoff_lat ): return df
 
-    #    if self.pars_cluster_kmeans['mixing']:
-    #        if os.path.isfile(mixing_path):
+        df_pickup  = df[[ pickup_lng,  pickup_lat ]]
+        df_dropoff = df[[ dropoff_lng, dropoff_lat]]
 
-    #        else:
-    #            df_train  = pd.DataFrame( np.vstack(( df[[ pickup_lng,  pickup_lat]].values, 
-    #                                                  df[[dropoff_lng, dropoff_lat]].values)), 
-    #                                      columns=['longitude','latitude'])
-    #            kmeans = cluster_kmeans( df_train, ['longitude','latitude'], self.DEBUG )
-    #     
-    #    if self.pars_cluster_kmeans['std']:
+        if self.pars_cluster_kmeans['mix']:
+            if os.path.isfile(load_path_mix):
+                print '>> [INFO] variables::create_cluster_kmeans : loaded the input cluster with mix case....'
+                kmeans = cluster_kmeans().init_cluster( load_path = load_path_mix )
 
+            else:
+                print '>> [INFO] variables::create_cluster_kmeans : fitting the cluster with mix case....'
+                df_mix = pd.DataFrame( np.vstack((df_pickup.values, df_dropoff.values)), columns=['longitude','latitude'])
+                kmeans = cluster_kmeans( df_mix, ['longitude','latitude'], self.DEBUG )
+                kmeans.init_cluster( batch_size = batch_size, n_zone = n_zone )
+                kmeans.fit( use_sample )
+                kmeans.save_cluster( save_path_mix, overwrite )
+
+            df['zone_kmeans_mix_pickup' ] = pd.DataFrame( kmeans.predict( df_pickup.values  ))
+            df['zone_kmeans_mix_dropoff'] = pd.DataFrame( kmeans.predict( df_dropoff.values ))
+
+        if self.pars_cluster_kmeans['std']:
+            if os.path.isfile(load_path_std_pickup) and os.path.isfile(load_path_std_dropoff):
+                print '>> [INFO] variables::create_cluster_kmeans : loaded the input cluster with std case....'
+                kmeans_pickup  = cluster_kmeans().init_cluster( load_path = load_path_std_pickup )
+                kmeans_dropoff = cluster_kmeans().init_cluster( load_path = load_path_std_dropoff )
+
+            else:
+                print '>> [INFO] variables::create_cluster_kmeans : fitting the cluster with std case....'
+                kmeans_pickup  = cluster_kmeans( df_pickup,  [ pickup_lng,  pickup_lat], self.DEBUG )
+                kmeans_pickup.init_cluster(  batch_size = batch_size, n_zone = n_zone )
+                kmeans_pickup.fit( use_sample )
+                kmeans_pickup.save_cluster( save_path_std_pickup, overwrite )
+
+                kmeans_dropoff = cluster_kmeans( df_dropoff, [dropoff_lng, dropoff_lat], self.DEBUG )
+                kmeans_dropoff.init_cluster( batch_size = batch_size, n_zone = n_zone )
+                kmeans_dropoff.fit( use_sample )
+                kmeans_dropoff.save_cluster( save_path_std_dropoff, overwrite )
+
+            df['zone_kmeans_std_pickup' ] = pd.DataFrame( kmeans_pickup.predict(  df_pickup.values  ))
+            df['zone_kmeans_std_dropoff'] = pd.DataFrame( kmeans_dropoff.predict( df_dropoff.values ))
 
     def delete_variable( self, df, variable_name ):
         if variable_name in list(df):

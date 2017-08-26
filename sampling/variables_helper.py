@@ -13,11 +13,18 @@ def add_variabel( df, addVarName, addVarColumn ):
 
 
 def is_exist( df, name ):
-    if name not in list(df):
-        print '>> [ERROR] No %s exist, do nothing'% name
-        return False
+    exist = True 
+    if type(name) is not list:
+        if name not in list(df):
+            print '>> [ERROR] No %s exist, do nothing'% name
+            print '>>         List following allowed: ', list(df)
+            exist = False
     else:
-        return True
+        if not set(name).issubset(set(list(df))):
+            print '>> [ERROR] No %s exist, do nothing'% name
+            print '>>         List following allowed: ', list(df)
+            exist = False
+    return exist
 
 
 def is_writable( save_path, overwrite=False ):
@@ -26,7 +33,7 @@ def is_writable( save_path, overwrite=False ):
     if os.path.isfile( save_path ): 
         file_exist = True
         if not overwrite:
-            print '>> [ERROR] Can not overwrite %s, unless overwrite=True'
+            print '>> [ERROR] Can not overwrite %s, unless overwrite=True'% save_path
             return False, file_exist
 
     dir_ = re.sub(r'(.*)/.*', r'\1', save_path)

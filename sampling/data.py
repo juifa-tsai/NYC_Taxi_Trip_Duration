@@ -54,7 +54,7 @@ class data:
                                   get_datetime_dropoff = False,
                                   get_distance         = True,
                                   get_speed            = True,
-                                  get_cluster_kmeans   = False,
+                                  get_cluster_kmeans   = True,
                                   get_cluster_density  = False,
                                   get_store_and_fwd_flag = True,
                                   ):

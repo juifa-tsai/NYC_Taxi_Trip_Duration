@@ -15,6 +15,7 @@ train = data( csvfile_path, debug=True )
 train.varGenerator.show_pars_all()
 train.varGenerator.reset_pars( 'datetime', 'year', False )
 train.varGenerator.show_pars('datetime')
+train.varGenerator.args_cluster_kmeans['overwrite']=True
 train.generate_variables('train')
 train.delete_variable('Id')
 train.delete_variable('id')
