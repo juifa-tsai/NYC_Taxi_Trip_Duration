@@ -50,13 +50,13 @@ class data:
     def generate_variables( self, datatype = 'train', 
                                   X_names  = None, 
                                   y_names  = None, 
-                                  get_datetime_pickup  = True, 
+                                  get_datetime_pickup  = False, 
                                   get_datetime_dropoff = False,
-                                  get_distance         = True,
-                                  get_speed            = True,
-                                  get_cluster_kmeans   = True,
+                                  get_distance         = False,
+                                  get_speed            = False,
+                                  get_cluster_kmeans   = False,
                                   get_cluster_density  = False,
-                                  get_store_and_fwd_flag = True,
+                                  get_store_and_fwd_flag = False,
                                   ):
         if not self.is_loaded() : return False
 
