@@ -36,7 +36,7 @@ class data:
             self.N         = len(self.df)
             self.variables = list(self.df)
             print '>> [INFO] Done, %d data loaded'% self.N  
-            return True
+            return self 
 
 
     def is_loaded( self ):
@@ -77,16 +77,20 @@ class data:
         if X_names and y_names:
             self.get_Xy( X_names, y_names)
 
+        return self
+
 
     def load_selection( self, cut_csv_path ):
         self.selector.load_cuts_csv( cut_csv_path )
         self.selections = self.selections.append( self.selector.cuts, ignore_index=True )
+        return self
 
 
     def apply_selection( self ):
         self.df   = self.selector.apply_cuts( self.df )
         self.effs = self.effs.append( self.selector.effs, ignore_index=True )
         self.N    = len(self.df)
+        return self
 
 
     def summary( self ):
@@ -95,19 +99,19 @@ class data:
         print '>> --------------------------------------------------------------------------'
         print '>> [INFO] data::summary() : summery of selections as following list'
         print df_sum
-        print '>  Total selection efficiency : %.4f'% df_sum['eff'].prod(0)
+        print '>  Total selection efficiency : %.4f'% df_sum['rel_eff'].prod(0)
         print '>> --------------------------------------------------------------------------'
-        print 
 
     def delete_variable( self, variable_name ):
         self.varGenerator.delete_variable( self.df, variable_name  )
         self.variables = list(self.df)
+        return self
 
 
     def get_Xy( X_names, y_names ):   
         self.X = []
         self.y = []
-        return 
+        return self
 
     def save_csv( self, save_path, overwrite=False ):
         is_writable_ = is_writable( save_path, overwrite )

@@ -30,7 +30,7 @@ class selectors:
         ## name, cut_min, cut_max, isBetween
         if not os.path.isfile(csv_path):
             print ">> [ERROR] Can't find %s, or may be not a file..."% csv_path
-            return False 
+            sys.exit()
         else: 
             self.cuts      = pd.read_csv(csv_path)
             self.csv_path  = csv_path
@@ -38,6 +38,7 @@ class selectors:
             if self.DEBUG:
                 print '>> [DEBUG] cuts list: '
                 self.showCuts()
+            return self
 
 
     def is_loaded( self ):
