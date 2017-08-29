@@ -6,6 +6,12 @@ from sklearn.cluster import *
 from variables_helper import *
 
 #class variables_cluster(object):
+#def get_duration_avg( df, groupby_name ):
+#    df.groupby([groupby_name])
+
+
+
+
 class cluster_kmeans:
 
     def __init__( self, df=None, var_names=[], debug=False):

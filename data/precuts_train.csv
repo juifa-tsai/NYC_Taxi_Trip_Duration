@@ -1,5 +1,5 @@
 name,cut_min,cut_max,isBetween
-trip_duration,300.0,7200.0,True
-distance_haversine,0.59567376271,11.0193052179,True
 speed_haversine,5.0,120.0,True
 pickup_digit_date,120.0,125.0,False
+passenger_count,1.,7.,True
+trip_duration,300.0,86400.1,True

@@ -81,7 +81,7 @@ class variables:
         elif partype == 'speed':           self.show_pars_dict( self.pars_speed,           'speed'          )
         elif partype == 'cluster_kmeans':  self.show_pars_dict( self.pars_cluster_kmeans,  'cluster_kmeans' )
         elif partype == 'cluster_density': self.show_pars_dict( self.pars_cluster_density, 'cluster_density')
-        else: print '>> [ERROR] unknown partype called %s, must be either datetime, distance, cluster_kmeans or cluster_density'
+        else: print '>> [ERROR] variables::show_pars : unknown partype called %s, must be either datetime, distance, cluster_kmeans or cluster_density'
 
 
     def show_pars_dict( self, pars_dict, title='' ):
@@ -96,7 +96,7 @@ class variables:
         elif partype == 'speed':           self.reset_pars_dict(  self.pars_speed,           parName, value, partype )
         elif partype == 'cluster_kmeans':  self.reset_pars_dict(  self.pars_cluster_kmeans,  parName, value, partype )
         elif partype == 'cluster_density': self.reset_pars_dict(  self.pars_cluster_density, parName, value, partype )
-        else: print '>> [ERROR] unknown partype called %s, must be either datetime, distance, cluster_kmeans or cluster_density'
+        else: print '>> [ERROR] variables::reset_pars : unknown partype called %s, must be either datetime, distance, cluster_kmeans or cluster_density'
 
 
     def reset_pars_dict( self, pars_dict, parName, value, title='' ):
@@ -269,6 +269,12 @@ class variables:
 
             df['zone_kmeans_std_pickup' ] = pd.DataFrame( kmeans_pickup.predict(  df_pickup.values  ))
             df['zone_kmeans_std_dropoff'] = pd.DataFrame( kmeans_dropoff.predict( df_dropoff.values ))
+
+
+    #def create_expacted_duration( self, df ):
+
+
+
 
     def delete_variable( self, df, variable_name ):
         if variable_name in list(df):

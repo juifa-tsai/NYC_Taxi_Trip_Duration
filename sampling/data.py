@@ -47,17 +47,17 @@ class data:
             return True
 
 
-    def generate_variables( self, datatype = 'train', 
-                                  X_names  = None, 
-                                  y_names  = None, 
-                                  get_datetime_pickup  = False, 
-                                  get_datetime_dropoff = False,
-                                  get_distance         = False,
-                                  get_speed            = False,
-                                  get_cluster_kmeans   = False,
-                                  get_cluster_density  = False,
-                                  get_store_and_fwd_flag = False,
-                                  ):
+    def varGenerator_run( self, datatype = 'train', 
+                                X_names  = None, 
+                                y_names  = None, 
+                                get_datetime_pickup  = False, 
+                                get_datetime_dropoff = False,
+                                get_distance         = False,
+                                get_speed            = False,
+                                get_cluster_kmeans   = False,
+                                get_cluster_density  = False,
+                                get_store_and_fwd_flag = False,
+                                ):
         if not self.is_loaded() : return False
 
         self.varGenerator.get_datetime_pickup    = get_datetime_pickup
@@ -88,6 +88,16 @@ class data:
         self.effs = self.effs.append( self.selector.effs, ignore_index=True )
         self.N    = len(self.df)
 
+
+    def summary( self ):
+        df_sum = self.selections.copy()
+        df_sum[['N', 'rel_eff']] = self.effs[['N', 'eff']]
+        print '>> --------------------------------------------------------------------------'
+        print '>> [INFO] data::summary() : summery of selections as following list'
+        print df_sum
+        print '>  Total selection efficiency : %.4f'% df_sum['eff'].prod(0)
+        print '>> --------------------------------------------------------------------------'
+        print 
 
     def delete_variable( self, variable_name ):
         self.varGenerator.delete_variable( self.df, variable_name  )
