@@ -30,7 +30,7 @@ print list(train.df)
 train.load_selection('data/precuts_train.csv').apply_selection()
 train.summary()
 
-train.varGenerator.args_cluster_kmeans['overwrite']=True
+train.varGenerator.args_cluster_kmeans['overwrite']=True # Overwirte the .pkl for kmeans
 train.varGenerator_run( 'train', 
                         get_cluster_kmeans=True )
 train.save_csv('tmp/test_presel_cluster.csv', overwrite=True)

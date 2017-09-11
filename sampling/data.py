@@ -5,6 +5,7 @@ import pandas as pd
 
 from selectors import *
 from variables import *
+from sklearn.model_selection import cross_val_score, train_test_split, ShuffleSplit
 
 class data:
 
@@ -17,6 +18,10 @@ class data:
         self.y_names = []
         self.X = None 
         self.y = None 
+        self.X_train = None 
+        self.X_test  = None 
+        self.y_train = None 
+        self.y_test  = None
         self.loaded       = self.load_csv( csv_path=csv_path )
         self.varGenerator = variables( debug=self.DEBUG )
         self.selector     = selectors( debug=self.DEBUG )
@@ -102,16 +107,31 @@ class data:
         print '>  Total selection efficiency : %.4f'% df_sum['rel_eff'].prod(0)
         print '>> --------------------------------------------------------------------------'
 
+
     def delete_variable( self, variable_name ):
         self.varGenerator.delete_variable( self.df, variable_name  )
         self.variables = list(self.df)
         return self
 
 
-    def get_Xy( X_names, y_names ):   
-        self.X = []
-        self.y = []
+    def get_Xy( X_names, y_names ):  
+        if not is_exist( self.df, X_names ): return self
+        if not is_exist( self.df, y_names ): return self
+        self.X = self.df[X_names].values
+        self.y = self.df[y_names].values
         return self
+
+
+    def Xy( test_size=.3, random_state=3 ):
+        self.get_Xy( self.X_names, self.y_names )
+        self.split_traintest( self.X, self.y, test_size, random_state )
+        return self
+
+
+    def split_traintest( X, y, test_size=.3, random_state=3 ):
+        self.X_train, self.X_test, self.y_train, self.y_test = train_test_split( X, y, test_size=test_size, random_state=random_state)
+        return self
+
 
     def save_csv( self, save_path, overwrite=False ):
         is_writable_ = is_writable( save_path, overwrite )

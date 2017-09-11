@@ -18,19 +18,21 @@ train.varGenerator.show_pars('datetime')
 train.varGenerator.args_cluster_kmeans['load_path_mix']='./kmeans_mix.pkl'
 train.varGenerator.args_cluster_kmeans['load_path_std_pickup'] ='./kmeans_pickup.pkl'
 train.varGenerator.args_cluster_kmeans['load_path_std_dropoff']='./kmeans_dropoff.pkl'
-train.run_varGenerator( 'train',
+train.varGenerator_run( 'train',
                          get_datetime_pickup=True, 
                          get_distance=True, 
                          get_speed=True, 
                          get_store_and_fwd_flag=True, 
                          get_cluster_kmeans=True )
 train.delete_variable('id')
-#train.save_csv('tmp/test.csv', overwrite=True)
+train.delete_variable('pickup_datetime')
+train.delete_variable('dropoff_datetime')
+train.save_csv('data/train_ext.csv', overwrite=True)
 print train.df.head()
 print list(train.df)
 
-train.load_selection('data/precuts_train.csv')
-train.apply_selection()
-print train.selections
-print train.effs
+#train.load_selection('data/precuts_train.csv')
+#train.apply_selection()
+#print train.selections
+#print train.effs
 
